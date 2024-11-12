@@ -1,0 +1,113 @@
+openapi: 3.0.3
+info:
+  title: Mortgage API Specification for mortgage related operations
+  description: |-
+    Allows two operations:
+    - get a list of current interest rates
+    - post the parameters to calculate for a mortgage check
+  version: 1.0-SNAPSHOT
+paths:
+  /interest-rates:
+    get:
+      summary: Get interest rates
+      description: Get a list of the current interest rates
+      operationId: getInterestRates
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InterestRateDto'
+        422:
+          description: ERROR
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+  /mortgage-check:
+    post:
+      summary: Calculate mortgage
+      description: Allows to post the parameters to calculate and check a mortgage
+      operationId: postMortgageCheck
+      requestBody:
+        description: Required parameters to do the mortgage check
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MortgageCheckDto'
+        required: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MortgageCheckResponseDto"
+        422:
+          description: ERROR
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    InterestRateDto:
+      type: object
+      properties:
+        maturityPeriod:
+          type: integer
+          example: 30
+        interestRate:
+          type: number
+          format: double
+          example: 1.45
+        lastUpdate:
+          type: string
+          format: date-time
+          example: 2024-11-10T19:10:10Z
+    MortgageCheckDto:
+      type: object
+      properties:
+        income:
+          type: number
+          format: double
+          example: 50000
+        maturityPeriod:
+          type: integer
+          example: 30
+        loanValue:
+          type: number
+          format: double
+          example: 150000
+        homeValue:
+          type: number
+          format: double
+          example: 180000
+    MortgageCheckResponseDto:
+      type: object
+      properties:
+        feasibility:
+          type: boolean
+          example: true
+        monthlyCost:
+          type: number
+          format: double
+          example: 1500
+    ErrorDto:
+      type: object
+      properties:
+        errorMessage:
+          type: string
+          example: Imposible to divide by 0
+        timestamp:
+          type: string
+          format: date-time
+          example: 2024-11-10T19:10:10Z
